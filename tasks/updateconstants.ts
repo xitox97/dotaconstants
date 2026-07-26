@@ -1,6 +1,10 @@
 import fs from "node:fs";
 import vdfparser from "vdf-parser";
-import { cleanupArray } from "./util.ts";
+import {
+  cleanupArray,
+  resolveSpecialBonusPlaceholders,
+  type SpecialBonusLookup,
+} from "./util.ts";
 
 const extraStrings = {
   DOTA_ABILITY_BEHAVIOR_NONE: "None",
@@ -655,6 +659,7 @@ async function start() {
             }
           }
         });
+        resolveSpecialBonusPlaceholders(abilities, specialBonusLookup);
         return abilities;
       },
     },
@@ -1654,7 +1659,7 @@ function removeSigns(template: string) {
     .replace("=", "");
 }
 
-let specialBonusLookup = {};
+let specialBonusLookup: SpecialBonusLookup = {};
 
 function replaceSValues(template: string, attribs: any[], key: string) {
   let values = specialBonusLookup[key] ?? {};

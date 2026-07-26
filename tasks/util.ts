@@ -23,3 +23,22 @@ export const cleanupArray = (array: string[]) => {
 
   return array.filter((n) => removeExtraneousWhitespacesFromString(n));
 };
+
+export type SpecialBonusLookup = Record<string, Record<string, string>>;
+
+export const resolveSpecialBonusPlaceholders = (
+  abilities: Record<string, { dname?: string }>,
+  lookup: SpecialBonusLookup,
+) => {
+  Object.entries(abilities).forEach(([name, ability]) => {
+    const values = lookup[name];
+    if (!ability.dname || !values) {
+      return;
+    }
+
+    ability.dname = ability.dname.replace(
+      /\{s:([^}]+)\}/g,
+      (placeholder, key) => values[key] ?? placeholder,
+    );
+  });
+};
