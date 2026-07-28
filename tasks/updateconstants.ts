@@ -643,6 +643,21 @@ async function start() {
               aghsAbilityValues[key] = aghsObj;
             }
           });
+        // Some current talents are referenced by npc_heroes.txt but don't have
+        // their own DOTAAbilities block in the corresponding hero file. Add
+        // localized entries for those talents without pulling in unreferenced
+        // legacy talent strings.
+        getReferencedHeroTalents(heroesVdf.DOTAHeroes).forEach((talent) => {
+          if (abilities[talent]) {
+            return;
+          }
+          const dname =
+            strings[`DOTA_Tooltip_ability_${talent}`] ??
+            strings[`DOTA_Tooltip_Ability_${talent}`];
+          if (dname) {
+            abilities[talent] = { dname };
+          }
+        });
         // Some unique talents don't show up in each hero data file
         // e.g. special_bonus_unique_axe_8
         // Do a pass through the strings and if any are missing, add them with just basic description
@@ -1659,6 +1674,25 @@ function removeSigns(template: string) {
     .replace("=", "");
 }
 
+function getReferencedHeroTalents(heroes: Record<string, any>) {
+  const talents = new Set<string>();
+  Object.values(heroes).forEach((hero) => {
+    const talentStart = Number(hero.AbilityTalentStart ?? 10);
+    Object.entries(hero).forEach(([key, value]) => {
+      const match = key.match(/^Ability(\d+)$/);
+      if (
+        match &&
+        Number(match[1]) >= talentStart &&
+        typeof value === "string" &&
+        value.startsWith("special_bonus")
+      ) {
+        talents.add(value);
+      }
+    });
+  });
+  return talents;
+}
+
 let specialBonusLookup: SpecialBonusLookup = {};
 
 function replaceSValues(template: string, attribs: any[], key: string) {
@@ -1698,11 +1732,7 @@ function replaceSValues(template: string, attribs: any[], key: string) {
             }
 
             // Clean up the value by removing signs
-            specialBonusVal = specialBonusVal
-              .replace("+", "")
-              .replace("-", "")
-              .replace("x", "")
-              .replace("%", "");
+            specialBonusVal = removeSigns(specialBonusVal).replace("%", "");
 
             if (specialBonusKey in specialBonusLookup) {
               specialBonusLookup[specialBonusKey][bonusKey] = specialBonusVal;
