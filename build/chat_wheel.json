@@ -4281,6 +4281,7 @@
   "735": {
     "id": 735,
     "name": "VoiceOfGod_1",
+    "all_chat": true,
     "label": "Well Played!",
     "message": "Well Played!",
     "sound_ext": "wav"
@@ -4288,16 +4289,17 @@
   "736": {
     "id": 736,
     "name": "VoiceOfGod_2",
-    "label": "Never Give Up.",
-    "message": "Never Give Up.",
+    "all_chat": true,
+    "label": "Never Give Up",
+    "message": "Never Give Up",
     "sound_ext": "wav"
   },
   "737": {
     "id": 737,
     "name": "VoiceOfGod_3",
     "all_chat": true,
-    "label": "That was regrettable.",
-    "message": "That was regrettable.",
+    "label": "That was regrettable",
+    "message": "That was regrettable",
     "sound_ext": "wav"
   },
   "738": {
@@ -4562,5 +4564,204 @@
     "name": "monster_hunter_atlas_complete_spray",
     "all_chat": true,
     "image": "sprays/monster_hunter/free/monster_hunter_atlas_complete_spray.psd"
+  },
+  "805": {
+    "id": 805,
+    "name": "dc_beastmaster",
+    "all_chat": true,
+    "image": "sprays/dark_carnival/dc_beastmaster_icon.png"
+  },
+  "806": {
+    "id": 806,
+    "name": "dc_monkey",
+    "all_chat": true,
+    "image": "sprays/dark_carnival/dc_monkey_icon.png"
+  },
+  "807": {
+    "id": 807,
+    "name": "dc_oracle",
+    "all_chat": true,
+    "image": "sprays/dark_carnival/dc_oracle_icon.png"
+  },
+  "808": {
+    "id": 808,
+    "name": "dc_ringmaster",
+    "all_chat": true,
+    "image": "sprays/dark_carnival/dc_ringmaster_icon.png"
+  },
+  "809": {
+    "id": 809,
+    "name": "dc_bristleback",
+    "all_chat": true,
+    "image": "sprays/dark_carnival/dc_bristleback_icon.png"
+  },
+  "810": {
+    "id": 810,
+    "name": "dc_meepo",
+    "all_chat": true,
+    "image": "sprays/dark_carnival/dc_meepo.png"
+  },
+  "811": {
+    "id": 811,
+    "name": "dc_hoodwink",
+    "all_chat": true,
+    "image": "sprays/dark_carnival/dc_hoodwink_icon.png"
+  },
+  "812": {
+    "id": 812,
+    "name": "dc_earthspirit",
+    "all_chat": true,
+    "image": "sprays/dark_carnival/dc_earthspirit_icon.png"
+  },
+  "813": {
+    "id": 813,
+    "name": "Guild_TI9_Legioncommander_Winner",
+    "image": "sprays/ti9_legioncommander_winner_icon.png"
+  },
+  "814": {
+    "id": 814,
+    "name": "Guild_TI10_Spray_12",
+    "image": "sprays/ti10_darkwillow_wow_icon.png"
+  },
+  "815": {
+    "id": 815,
+    "name": "Guild_Thumbs_Up",
+    "image": "sprays/tide_thumbsup_spray_icon.png"
+  },
+  "816": {
+    "id": 816,
+    "name": "Guild_Nothing_That_Can_Stop_This_Man",
+    "all_chat": true,
+    "label": "Nothing Can Stop This Man",
+    "message": "There is nothing that can stop this man",
+    "sound_ext": "wav"
+  },
+  "817": {
+    "id": 817,
+    "name": "Guild_A_Nu_Ka_Idi_Suda",
+    "all_chat": true,
+    "label": "Иди-ка сюда",
+    "message": "А ну-ка иди-ка сюда. А вот все. Все.",
+    "sound_ext": "wav"
+  },
+  "818": {
+    "id": 818,
+    "name": "dc_money_and_bones",
+    "all_chat": true,
+    "label": "MONEY AND BONES! MONEY AND BONES!",
+    "message": "MONEY AND BONES! MONEY AND BONES!",
+    "sound_ext": "wav"
+  },
+  "819": {
+    "id": 819,
+    "name": "dc_are_we_the_idiots",
+    "all_chat": true,
+    "label": "Are we the idiots?",
+    "message": "Are we the idiots?",
+    "sound_ext": "wav"
+  },
+  "820": {
+    "id": 820,
+    "name": "dc_wow",
+    "all_chat": true,
+    "label": "Wow!",
+    "message": "Wow!",
+    "sound_ext": "wav"
+  },
+  "821": {
+    "id": 821,
+    "name": "dc_its_not_that_funny",
+    "all_chat": true,
+    "label": "It's not that funny.",
+    "message": "It's not that funny.",
+    "sound_ext": "wav"
+  },
+  "822": {
+    "id": 822,
+    "name": "dc_im_sorry_who_are_you_again",
+    "all_chat": true,
+    "label": "I'm... sorry, who are you again?",
+    "message": "I'm... sorry, who are you again?",
+    "sound_ext": "wav"
+  },
+  "823": {
+    "id": 823,
+    "name": "dc_look_at_me_i_quit",
+    "all_chat": true,
+    "label": "Look at me! I quit.",
+    "message": "Look at me! I quit.",
+    "sound_ext": "wav"
+  },
+  "824": {
+    "id": 824,
+    "name": "Community_TI15_maincast_1",
+    "all_chat": true,
+    "label": "О-о-о, найс! Оце потужно!",
+    "message": "О-о-о, найс! Оце потужно!",
+    "sound_ext": "mp3"
+  },
+  "825": {
+    "id": 825,
+    "name": "Community_TI15_maincast_2",
+    "all_chat": true,
+    "label": "Тисну руку. Обіймаю.",
+    "message": "Тисну руку. Обіймаю.",
+    "sound_ext": "mp3"
+  },
+  "826": {
+    "id": 826,
+    "name": "Community_TI15_maincast_3",
+    "all_chat": true,
+    "label": "Джентльмени, ми на порозі грандіозного камбеку.",
+    "message": "Джентльмени, ми на порозі грандіозного камбеку.",
+    "sound_ext": "mp3"
+  },
+  "827": {
+    "id": 827,
+    "name": "Community_TI15_ns_art_1",
+    "all_chat": true,
+    "label": "Abocanha, garoto!",
+    "message": "Abocanha, garoto!",
+    "sound_ext": "mp3"
+  },
+  "828": {
+    "id": 828,
+    "name": "Community_TI15_ns_art_2",
+    "all_chat": true,
+    "label": "Pináculo!",
+    "message": "Pináculo!",
+    "sound_ext": "mp3"
+  },
+  "829": {
+    "id": 829,
+    "name": "Community_TI15_ns_art_3",
+    "all_chat": true,
+    "label": "Agora sou eu e você, meu gostoso!",
+    "message": "Agora sou eu e você, meu gostoso!",
+    "sound_ext": "mp3"
+  },
+  "830": {
+    "id": 830,
+    "name": "Community_TI15_wxc_1",
+    "all_chat": true,
+    "label": "Buo ang loob, sira ang tuktok.",
+    "message": "Buo ang loob, sira ang tuktok.",
+    "sound_ext": "mp3"
+  },
+  "831": {
+    "id": 831,
+    "name": "Community_TI15_wxc_2",
+    "all_chat": true,
+    "label": "D-d-d-d-dagger out peace!",
+    "message": "D-d-d-d-dagger out peace!",
+    "sound_ext": "mp3"
+  },
+  "832": {
+    "id": 832,
+    "name": "Community_TI15_wxc_3",
+    "all_chat": true,
+    "label": "Geng, geng, geng, geng… Kami naman!",
+    "message": "Geng, geng, geng, geng… Kami naman!",
+    "sound_ext": "mp3"
   }
 }
