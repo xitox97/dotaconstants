@@ -127,6 +127,8 @@ const idsUrl =
   "https://raw.githubusercontent.com/dotabuff/d2vpkr/master/dota/scripts/npc/npc_ability_ids.txt";
 const heroesUrl =
   "https://raw.githubusercontent.com/dotabuff/d2vpkr/master/dota/scripts/npc/npc_heroes.txt";
+const heroesDirUrl =
+  "https://raw.githubusercontent.com/dotabuff/d2vpkr/master/dota/scripts/npc/heroes/";
 const abilitiesLoc =
   "https://raw.githubusercontent.com/dotabuff/d2vpkr/master/dota/resource/localization/abilities_english.txt";
 const npcAbilitiesUrl =
@@ -138,33 +140,28 @@ const localizationUrl =
 
 let aghsAbilityValues = {};
 const heroDataUrls: string[] = [];
-const heroDataIndex: string[] = [];
-const abilitiesUrls = [abilitiesLoc, npcAbilitiesUrl];
 
 start();
 async function start() {
-  const resp = await fetch(heroesUrl);
-  const heroesVdf = parseJsonOrVdf(await resp.text(), heroesUrl);
-  let ids = Object.keys(heroesVdf.DOTAHeroes)
-    .filter((name) => !badNames.has(name))
-    .map((key) => heroesVdf.DOTAHeroes[key].HeroID)
+  // Hero data (and each hero's abilities) lives in per-hero files, fetched once
+  // here and shared by every source transform below.
+  const heroesVdf = await fetchHeroes();
+  const heroNames = Object.keys(heroesVdf.DOTAHeroes).filter(
+    (name) => !badNames.has(name),
+  );
+  const ids = heroNames
+    .map((name) => heroesVdf.DOTAHeroes[name].HeroID)
     .sort((a, b) => Number(a) - Number(b));
   ids.forEach((key) => {
     heroDataUrls.push(
       "http://www.dota2.com/datafeed/herodata?language=english&hero_id=" + key,
     );
   });
-  let names = Object.keys(heroesVdf.DOTAHeroes).filter(
-    (name) => !badNames.has(name),
-  );
-  names.forEach((name) => {
-    // The hero abilities were moved to individual hero files, e.g. https://raw.githubusercontent.com/dotabuff/d2vpkr/master/dota/scripts/npc/heroes/npc_dota_hero_abaddon.txt
-    abilitiesUrls.push(
-      "https://raw.githubusercontent.com/dotabuff/d2vpkr/master/dota/scripts/npc/heroes/" +
-        name +
-        ".txt",
-    );
-    heroDataIndex.push(name);
+  // hero name => its DOTAAbilities-like block of ability scripts
+  const heroAbilityScripts: Record<string, any> = {};
+  heroNames.forEach((name) => {
+    heroAbilityScripts[name] =
+      heroesVdf.DOTAHeroes[name].AbilityDefinitions ?? {};
   });
 
   const sources = [
@@ -437,16 +434,15 @@ async function start() {
     },
     {
       key: "abilities",
-      url: abilitiesUrls,
+      url: [abilitiesLoc, npcAbilitiesUrl],
       transform: (respObj: any) => {
         const strings = respObj[0].lang.Tokens;
-        let scripts = respObj[1].DOTAAbilities;
-        // Merge into scripts all the hero abilities (the rest of the array)
-        for (let i = 2; i < respObj.length; i++) {
-          // console.log(respObj[i]);
-          const heroAbs = respObj[i].DOTAAbilities;
-          scripts = { ...scripts, ...heroAbs };
-        }
+        // Merge into the generic scripts all the hero abilities
+        const scripts = Object.assign(
+          {},
+          respObj[1].DOTAAbilities,
+          ...Object.values(heroAbilityScripts),
+        );
         let abilities = {};
 
         Object.keys(scripts)
@@ -884,17 +880,14 @@ async function start() {
     },
     {
       key: "heroes",
-      url: [localizationUrl, heroesUrl],
+      url: localizationUrl,
       transform: (respObj: any) => {
         let heroes: any = [];
-        let keys = Object.keys(respObj[1].DOTAHeroes).filter(
-          (name) => !badNames.has(name),
-        );
-        keys.forEach((name) => {
-          let h: any = formatVpkHero(name, respObj[1]);
+        heroNames.forEach((name) => {
+          let h: any = formatVpkHero(name, heroesVdf);
           h.localized_name =
-            respObj[1].DOTAHeroes[name].workshop_guide_name ??
-            respObj[0].lang.Tokens[name + ":n"];
+            heroesVdf.DOTAHeroes[name].workshop_guide_name ??
+            respObj.lang.Tokens[name + ":n"];
           heroes.push(h);
         });
         heroes = heroes.sort((a, b) => a.id - b.id);
@@ -908,21 +901,15 @@ async function start() {
     },
     {
       key: "hero_lore",
-      url: [
-        "https://raw.githubusercontent.com/dotabuff/d2vpkr/master/dota/resource/localization/hero_lore_english.txt",
-        heroesUrl,
-      ],
+      url: "https://raw.githubusercontent.com/dotabuff/d2vpkr/master/dota/resource/localization/hero_lore_english.txt",
       transform: (respObj: any) => {
-        let keys = Object.keys(respObj[1].DOTAHeroes).filter(
-          (name) => !badNames.has(name),
-        );
         let sortedHeroes: { name: string; id: number }[] = [];
-        keys.forEach((name) => {
-          const hero = respObj[1].DOTAHeroes[name];
+        heroNames.forEach((name) => {
+          const hero = heroesVdf.DOTAHeroes[name];
           sortedHeroes.push({ name, id: hero.HeroID });
         });
         sortedHeroes = sortedHeroes.sort((a, b) => a.id - b.id);
-        const lore = respObj[0].lang.Tokens;
+        const lore = respObj.lang.Tokens;
         const heroLore = {};
         sortedHeroes.forEach((hero) => {
           const heroKey = hero.name.replace("npc_dota_hero_", "");
@@ -940,22 +927,16 @@ async function start() {
     },
     {
       key: "hero_abilities",
-      url: [heroesUrl, ...abilitiesUrls],
+      url: abilitiesLoc,
       transform: (respObj: any) => {
-        const [heroObj, abilityLoc, _, ...heroAbils] = respObj;
-
-        const strings = abilityLoc.lang.Tokens;
+        const strings = respObj.lang.Tokens;
         // Fix places where valve doesn't care about correct case
         Object.keys(strings).forEach((key) => {
           strings[key.toLowerCase()] = strings[key];
         });
 
-        let scripts = {};
-        for (let i = 0; i < heroAbils.length; i++) {
-          scripts[heroDataIndex[i]] = heroAbils[i].DOTAAbilities;
-        }
-
-        let heroes = heroObj.DOTAHeroes;
+        const scripts = heroAbilityScripts;
+        let heroes = heroesVdf.DOTAHeroes;
         const heroAbilities = {};
         Object.keys(heroes).forEach(function (heroKey) {
           if (
@@ -1396,13 +1377,7 @@ async function start() {
     // Make all urls into array
     const arr = Array.isArray(url) ? url : [url];
     // console.log(arr);
-    const resps = await Promise.all(
-      arr.map(async (url) => {
-        console.log(url);
-        const resp = await fetch(url);
-        return parseJsonOrVdf(await resp.text(), url);
-      }),
-    );
+    const resps = await Promise.all(arr.map(fetchAndParse));
     let final: any = resps;
     if (s.transform) {
       final = s.transform(resps.length === 1 ? resps[0] : resps);
@@ -1435,6 +1410,40 @@ async function start() {
   fs.writeFileSync("./index.js", code);
   fs.writeFileSync("./index.ts", code);
   process.exit(0);
+}
+
+async function fetchAndParse(url: string) {
+  console.log(url);
+  const resp = await fetch(url);
+  return parseJsonOrVdf(await resp.text(), url);
+}
+
+// npc_heroes.txt no longer holds the hero data itself, it only #base-includes
+// one file per hero from scripts/npc/heroes/, e.g.
+// https://raw.githubusercontent.com/dotabuff/d2vpkr/master/dota/scripts/npc/heroes/npc_dota_hero_abaddon.txt
+// Each of those files has a DOTAHeroes block with the hero and its abilities
+// (under AbilityDefinitions). Merge them all back into a single DOTAHeroes.
+async function fetchHeroes() {
+  console.log(heroesUrl);
+  const resp = await fetch(heroesUrl);
+  const text = await resp.text();
+  const baseRegex = /^#base\s+"heroes\/([^"]+)"/gm;
+  const heroFiles = [...text.matchAll(baseRegex)].map((m) => m[1]);
+  if (heroFiles.length === 0) {
+    throw new Error(`No #base hero includes found in ${heroesUrl}`);
+  }
+  // The parser can't handle #base directives, strip them and keep the rest
+  // (e.g. Version) as the starting point
+  const heroesVdf = parseJsonOrVdf(text.replace(baseRegex, ""), heroesUrl);
+  heroesVdf.DOTAHeroes ??= {};
+  const heroVdfs = await Promise.all(
+    heroFiles.map((file) => fetchAndParse(heroesDirUrl + file)),
+  );
+  // Same order as the #base includes, which is the in-game hero order
+  heroVdfs.forEach((vdf) => {
+    Object.assign(heroesVdf.DOTAHeroes, vdf.DOTAHeroes);
+  });
+  return heroesVdf;
 }
 
 function isObj(obj: any) {
